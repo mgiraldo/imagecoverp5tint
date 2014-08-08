@@ -38,6 +38,7 @@ int lineThickness = 1;
 boolean faceDetect = true;
 
 ArrayList<PImage> images;
+ArrayList<PImage> covers;
 
 PFont titleFont;
 PFont authorFont;
@@ -60,6 +61,7 @@ void setup() {
   background(255);
   noStroke();
   images = new ArrayList<PImage>();
+  covers = new ArrayList<PImage>();
   cp5 = new ControlP5(this);
   pg = createGraphics(COVERWIDTH, COVERHEIGHT);
   controlP5Setup();
@@ -148,6 +150,7 @@ void draw() {
     parseBook();
     processColors();
     getBookImages();
+    createCovers();
     if (images.size() == 0) {
       println("BOOK HAS NO USEFUL IMAGES");
     }
@@ -173,12 +176,23 @@ void drawCovers() {
   for (i=0;i<l;i++) {
     x = xini + (col * (colWidth));
     y = yini + (row * rowHeight);
-    image(createCover(i), x, y);
+    image(covers.get(i), x, y);
     col++;
     if (col >= cols) {
       col = 0;
       row++;
     }
+  }
+}
+
+void createCovers() {
+  covers.clear();
+  int i, l = images.size();;
+
+  if (l==0) return;
+
+  for (i=0;i<l;i++) {
+    covers.add(createCover(i));
   }
 }
 
@@ -351,7 +365,7 @@ void saveCurrent() {
   // println(images);
   for (i=0;i<l;i++) {
     // save here
-    PImage temp = createCover(i); // get(x, y, COVERWIDTH, COVERHEIGHT);
+    PImage temp = covers.get(i); // get(x, y, COVERWIDTH, COVERHEIGHT);
     temp.save("output/cover_" + currentId + "_" + i + ".png");
     // end save
   }
