@@ -18,6 +18,8 @@ int TITLEHEIGHT = 50;
 int AUTHORHEIGHT = 25;
 int BACKGROUNDCOLOR = 128;
 
+PGraphics pg;
+
 OpenCV opencv;
 Rectangle[] faces;
 
@@ -36,7 +38,6 @@ int lineThickness = 1;
 boolean faceDetect = true;
 
 ArrayList<PImage> images;
-ArrayList<PImage> imagesBW;
 
 PFont titleFont;
 PFont authorFont;
@@ -59,8 +60,8 @@ void setup() {
   background(255);
   noStroke();
   images = new ArrayList<PImage>();
-  imagesBW = new ArrayList<PImage>();
   cp5 = new ControlP5(this);
+  pg = createGraphics(COVERWIDTH, COVERHEIGHT);
   controlP5Setup();
   loadData();
 }
@@ -144,9 +145,10 @@ void draw() {
   if (refresh) {
     refresh = false;
     getNextBook();
-    if (images.size() > 0) {
-      processColors();
-    } else {
+    parseBook();
+    processColors();
+    getBookImages();
+    if (images.size() == 0) {
       println("BOOK HAS NO USEFUL IMAGES");
     }
   }
@@ -171,15 +173,23 @@ void drawCovers() {
   for (i=0;i<l;i++) {
     x = xini + (col * (colWidth));
     y = yini + (row * rowHeight);
-    drawBackground(x, y);
-    drawArtwork(i, x, y);
-    drawText(x, y);
+    image(createCover(i), x, y);
     col++;
     if (col >= cols) {
       col = 0;
       row++;
     }
   }
+}
+
+PImage createCover(int index) {
+  pg.clear();
+  pg.beginDraw();
+  drawBackground(pg, 0, 0);
+  drawArtwork(pg, index, 0, 0);
+  drawText(pg, 0, 0);
+  pg.endDraw();
+  return pg.get();
 }
 
 void loadData() {
@@ -193,15 +203,10 @@ void getNextBook() {
   String[] filenames;
   int rnd = config.length-1;
   currentId = int(config[currentBook]);
-  path = BASEFOLDER + currentId + "/images/";
-  filenames = getImagesList(path);
-  parseBook();
-  getBookImages();
 }
 
 void getBookImages() {
   images.clear();
-  imagesBW.clear();
   String path = BASEFOLDER + currentId + "/images/";
 
   String[] filenames = getImagesList(path);
@@ -256,8 +261,16 @@ void getBookImages() {
     // println("i3:" + i + " w:" + int((temp.width-COVERWIDTH)*.5) + " h:" + int((temp.height-COVERHEIGHT)*.5));
     imgBW.filter(GRAY);
     img = imgBW.get(0, 0, COVERWIDTH, topMargin-MARGIN);
-    images.add(img);
-    imagesBW.add(imgBW);
+    imgBW = imgBW.get(0, topMargin-MARGIN, COVERWIDTH, COVERHEIGHT-topMargin+MARGIN);
+
+    pg.clear();
+    pg.beginDraw();
+    pg.tint(baseColor);
+    pg.image(img, 0, 0);
+    pg.noTint();
+    pg.image(imgBW, 0, topMargin-MARGIN);
+    pg.endDraw();
+    images.add(pg.get());
   }
 }
 
@@ -303,48 +316,46 @@ void processColors() {
   colorMode(RGB, 255);
 }
 
-void drawArtwork(int index, int _x, int _y) {
+void drawArtwork(PGraphics g, int index, int _x, int _y) {
   PImage img = images.get(index);
-  PImage imgBW = imagesBW.get(index);
   int x = _x; //+int((COVERWIDTH - img.width) * .5);
   int y = _y; //+int((COVERHEIGHT - img.height) * .5);
-  // println("w:" + img.width + " h:" + img.height);
-  // fill(textColor);
-  // rect(x-2,y-2,img.width+4,img.height+4);
-  image(imgBW, x, y);
-  tint(baseColor, 255-imageAlpha);
-  image(img, x, y);
-  noTint();
+  g.image(img, x, y);
 }
 
-void drawBackground(int x, int y) {
-  fill(BACKGROUNDCOLOR);
-  rect(x, y, COVERWIDTH, COVERHEIGHT);
+void drawBackground(PGraphics g, int x, int y) {
+  g.fill(BACKGROUNDCOLOR);
+  g.rect(x, y, COVERWIDTH, COVERHEIGHT);
 }
 
-void drawText(int x, int y) {
+void drawText(PGraphics g, int x, int y) {
   //…
-  fill(textColor);
-  rect(x, y+topMargin-lineThickness-MARGIN, COVERWIDTH, lineThickness);
-  fill(0, textBackgroundAlpha);
-  rect(x, y+topMargin-MARGIN, COVERWIDTH, COVERHEIGHT-topMargin+MARGIN);
-  fill(textColor);
-  textFont(titleFont, titleSize);
-  textLeading(titleSize);
-  textAlign(LEFT);
-  text(title, x+MARGIN, y+topMargin, COVERWIDTH - (2 * MARGIN), TITLEHEIGHT);
-  textLeading(authorSize);
-  textFont(authorFont, authorSize);
-  text(author, x+MARGIN, y+topMargin+TITLEHEIGHT+MARGIN, COVERWIDTH - (2 * MARGIN), AUTHORHEIGHT);
+  g.noStroke();
+  g.fill(textColor);
+  g.rect(x, y+topMargin-lineThickness-MARGIN, COVERWIDTH, lineThickness);
+  g.fill(0, textBackgroundAlpha);
+  g.rect(x, y+topMargin-MARGIN, COVERWIDTH, COVERHEIGHT-topMargin+MARGIN);
+  g.fill(textColor);
+  g.textFont(titleFont, titleSize);
+  g.textLeading(titleSize);
+  g.textAlign(LEFT);
+  g.text(title, x+MARGIN, y+topMargin, COVERWIDTH - (2 * MARGIN), TITLEHEIGHT);
+  g.textLeading(authorSize);
+  g.textFont(authorFont, authorSize);
+  g.text(author, x+MARGIN, y+topMargin+TITLEHEIGHT+MARGIN, COVERWIDTH - (2 * MARGIN), AUTHORHEIGHT);
 }
 
 void saveCurrent() {
-  PImage temp = get(ARTWORKSTARTX, ARTWORKSTARTY, COVERWIDTH, COVERHEIGHT);
-  if (filename.equals("")) {
-    temp.save("output/cover_" + currentBook + ".png");
-  } else {
-    temp.save("output/" + filename);
+  int i, l;
+  l = images.size();
+  // println(images);
+  for (i=0;i<l;i++) {
+    // save here
+    PImage temp = createCover(i); // get(x, y, COVERWIDTH, COVERHEIGHT);
+    temp.save("output/cover_" + currentId + "_" + i + ".png");
+    // end save
   }
+
 }
 
 void keyPressed() {
