@@ -28,8 +28,8 @@ ControlP5 cp5;
 DropdownList titleFontList;
 DropdownList authorFontList;
 
-int baseSaturation = 80;//70;
-int baseBrightness = 65;//85;
+int baseSaturation = 60;//70;
+int baseBrightness = 80;//85;
 int imageBrightness = -200;
 int imageAlpha = 10;
 int topMargin = 160;
@@ -242,6 +242,10 @@ void getBookImages() {
 
   // println("ratio:" + COVERRATIO);
   for (i=0;i<l;i++) {
+    if (filenames[i].indexOf("cover") != -1 || filenames[i].indexOf("title") != -1) {
+      // skip generic covers (usually named "cover.jpg" or "title.jpg")
+      continue;
+    }
     temp = loadImage(path + filenames[i]);
     // check for faces (not faeces)
     if (faceDetect) {
@@ -274,15 +278,16 @@ void getBookImages() {
     // println("i2:" + i + " w:" + temp.width + " h:" + temp.height);
     // println("i3:" + i + " w:" + int((temp.width-COVERWIDTH)*.5) + " h:" + int((temp.height-COVERHEIGHT)*.5));
     imgBW.filter(GRAY);
-    img = imgBW.get(0, 0, COVERWIDTH, topMargin-MARGIN);
+    img = imgBW.get(0, 0, COVERWIDTH, COVERHEIGHT);
     imgBW = imgBW.get(0, topMargin-MARGIN, COVERWIDTH, COVERHEIGHT-topMargin+MARGIN);
 
     pg.clear();
     pg.beginDraw();
+    pg.background(baseColor);
     pg.tint(baseColor);
     pg.image(img, 0, 0);
-    pg.noTint();
-    pg.image(imgBW, 0, topMargin-MARGIN);
+    // pg.noTint();
+    // pg.image(imgBW, 0, topMargin-MARGIN);
     pg.endDraw();
     images.add(pg.get());
   }
@@ -345,10 +350,10 @@ void drawBackground(PGraphics g, int x, int y) {
 void drawText(PGraphics g, int x, int y) {
   //…
   g.noStroke();
-  g.fill(textColor);
-  g.rect(x, y+topMargin-lineThickness-MARGIN, COVERWIDTH, lineThickness);
-  g.fill(0, textBackgroundAlpha);
-  g.rect(x, y+topMargin-MARGIN, COVERWIDTH, COVERHEIGHT-topMargin+MARGIN);
+  // g.fill(textColor);
+  // g.rect(x, y+topMargin-lineThickness-MARGIN, COVERWIDTH, lineThickness);
+  // g.fill(0, textBackgroundAlpha);
+  // g.rect(x, y+topMargin-MARGIN, COVERWIDTH, COVERHEIGHT-topMargin+MARGIN);
   g.fill(textColor);
   g.textFont(titleFont, titleSize);
   g.textLeading(titleSize);
