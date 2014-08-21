@@ -7,4 +7,4 @@ Includes **[OpenCV for Processing](https://github.com/atduskgreg/opencv-processi
 
 ## Example output
 
-![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example1.png) ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example2.png) ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example3.png) ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example4.png) ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example5.png)
+![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example1.png) ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example2.png) ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example3.png) ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example4.png) ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example5.png) ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example6.png)
