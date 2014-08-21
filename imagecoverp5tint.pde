@@ -319,6 +319,8 @@ void parseBook() {
   JSONObject book = getBook(currentBook);
   title = book.getString("title");
   String subtitle = "";
+  String json_author = "";
+
   try {
     subtitle = book.getString("subtitle");
   }
@@ -330,7 +332,17 @@ void parseBook() {
   }
   currentId = book.getInt("identifier");
   title = title.toUpperCase();
-  author = book.getString("authors");
+
+  try {
+    json_author = book.getString("authors");
+  }
+  catch (Exception e) {
+    println("book has no authors");
+  }
+  if (json_author.equals("")) {
+    author = "";
+  }
+
   filename = book.getString("identifier") + ".png";
 
   processColors();
