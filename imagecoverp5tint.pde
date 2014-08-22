@@ -348,7 +348,7 @@ void parseBook() {
   title = title.toUpperCase();
 
   try {
-    json_author = book.getString("authors");
+    json_author = book.getString("authors_long");
   }
   catch (Exception e) {
     println("book has no authors");
