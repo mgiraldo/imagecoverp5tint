@@ -248,14 +248,19 @@ void getBookImages(JSONArray json_images) {
   for (i=0;i<l;i++) {
     String path = json_images.getString(i);
 
-    if (path.indexOf("cover") != -1 || path.indexOf("title") != -1) {
+    if (path.indexOf("cover") != -1
+      || path.indexOf("title") != -1
+      || (!path.endsWith(".jpg") && !path.endsWith(".png"))) {
       // skip generic covers (usually named "cover.jpg" or "title.jpg")
       continue;
     }
 
     path = baseFolder + path.replace("./","");
-    println("loading:" + path);
+    // println("loading:" + path);
     temp = loadImage(path);
+    if (temp == null) {
+      continue;
+    }
     // check for faces (not faeces)
     if (faceDetect) {
       opencv = new OpenCV(this, temp);
@@ -339,8 +344,23 @@ void parseBook() {
   catch (Exception e) {
     println("book has no authors");
   }
-  if (json_author.equals("")) {
+  if (!json_author.equals("")) {
+    author = json_author;
+  } else {
     author = "";
+  }
+
+  // now try the short author
+  json_author = "";
+
+  try {
+    json_author = book.getString("authors_short");
+  }
+  catch (Exception e) {
+    println("book has no authors");
+  }
+  if (!json_author.equals("")) {
+    author = json_author;
   }
 
   filename = book.getString("identifier") + ".png";
