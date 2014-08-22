@@ -16,6 +16,7 @@ int IMAGEMARGIN = 10;
 int TITLEHEIGHT = 50;
 int AUTHORHEIGHT = 25;
 int BACKGROUNDCOLOR = 128;
+int MAXAUTHORCHAR = 24;
 
 PGraphics pg;
 
@@ -359,7 +360,7 @@ void parseBook() {
   catch (Exception e) {
     println("book has no authors");
   }
-  if (!json_author.equals("")) {
+  if (!json_author.equals("") && author.length() > MAXAUTHORCHAR) {
     author = json_author;
   }
 
