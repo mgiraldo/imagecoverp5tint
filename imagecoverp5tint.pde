@@ -58,6 +58,9 @@ String author = "";
 String filename = "";
 String baseFolder = "";
 
+int startTime = 0;
+int imageCounter = 0;
+
 void setup() {
   selectFolder("Select a folder to process:", "folderSelected");
   size(SCREENWIDTH, SCREENHEIGHT);
@@ -176,6 +179,10 @@ void draw() {
       currentBook = 0;
       batch = false;
       refresh = false;
+      int endTime = millis();
+      int seconds = round((endTime - startTime)*.001);
+      int minutes = round(seconds/60);
+      println("Processing " + imageCounter + " images for " + bookList.length + " books took " + minutes + " minutes (" + seconds + " seconds)");
     }
   }
 }
@@ -212,6 +219,7 @@ void createCovers() {
   if (l==0) return;
 
   for (i=0;i<l;i++) {
+    imageCounter++;
     covers.add(createCover(i));
   }
 }
@@ -462,6 +470,11 @@ void keyPressed() {
 }
 
 void controlEvent(ControlEvent theEvent) {
+  if (theEvent.isController()) {
+    if (theEvent.getController().getName().equals("batch")) {
+      startTime = millis();
+    }
+  }
   if (theEvent.isGroup()) {
     // an event from a group e.g. scrollList
     println(theEvent.group().value()+" from "+theEvent.group());
