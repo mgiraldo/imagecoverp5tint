@@ -17,6 +17,7 @@ int TITLEHEIGHT = 50;
 int AUTHORHEIGHT = 25;
 int BACKGROUNDCOLOR = 128;
 int MAXAUTHORCHAR = 24;
+int MAXTITLECHAR = 80;
 
 PGraphics pg;
 
@@ -384,7 +385,18 @@ void parseBook() {
   if (!subtitle.equals("")) {
     title += ": " + subtitle;
   }
+
   title = title.toUpperCase();
+
+  try {
+    subtitle = book.getString("title_short");
+  }
+  catch (Exception e) {
+    // println("book has no short authors");
+  }
+  if (!subtitle.equals("") && title.length() > MAXTITLECHAR) {
+    title = subtitle;
+  }
 
   try {
     json_author = book.getString("authors_long");
@@ -423,7 +435,7 @@ void parseBook() {
 
 void processColors() {
   int counts = title.length() + author.length();
-  int colorSeed = int(map(counts, 6, 60, 30, 260));
+  int colorSeed = int(map(counts, 6, MAXTITLECHAR+MAXAUTHORCHAR, 30, 260));
   colorMode(HSB, 360, 100, 100);
   color lightColor = color((colorSeed+180)%360, baseSaturation-20, baseBrightness+40);
   color darkColor = color(colorSeed, baseSaturation, baseBrightness-20);
