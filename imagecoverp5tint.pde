@@ -279,6 +279,7 @@ void getBookImages(JSONArray json_images) {
 
     if (path.toLowerCase().indexOf("cover") != -1
       || path.toLowerCase().indexOf("title") != -1
+      || path.toLowerCase().indexOf("page-images") != -1
       || (!path.endsWith(".jpg") && !path.endsWith(".png"))) {
       // skip generic covers (usually named "cover.jpg" or "title.jpg")
       continue;
