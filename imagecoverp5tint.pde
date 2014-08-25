@@ -423,7 +423,7 @@ void parseBook() {
 
 void processColors() {
   int counts = title.length() + author.length();
-  int colorSeed = int(map(counts, 1, 80, 30, 260));
+  int colorSeed = int(map(counts, 6, 60, 30, 260));
   colorMode(HSB, 360, 100, 100);
   color lightColor = color((colorSeed+180)%360, baseSaturation-20, baseBrightness+40);
   color darkColor = color(colorSeed, baseSaturation, baseBrightness-20);
