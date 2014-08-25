@@ -60,6 +60,7 @@ String baseFolder = "";
 
 int startTime = 0;
 int imageCounter = 0;
+int startID = 0;
 
 void setup() {
   selectFolder("Select a folder to process:", "folderSelected");
@@ -124,9 +125,16 @@ void controlP5Setup() {
      .setSize(50,20)
      ;
 
+  cp5.addTextfield("inputID")
+     .setPosition(790,5)
+     .setSize(100,20)
+     .setFocus(true)
+     .setColor(color(255,0,0))
+     ;
+
   titleFontList = cp5.addDropdownList("titleList")
-         .setPosition(790, 15)
-         .setSize(200, 200)
+         .setPosition(900, 15)
+         .setSize(150, 200)
          ;
 
   titleFontList.captionLabel().toUpperCase(true);
@@ -141,8 +149,8 @@ void controlP5Setup() {
   titleFontList.setIndex(6);
 
   authorFontList = cp5.addDropdownList("authorList")
-         .setPosition(1000, 15)
-         .setSize(200, 200)
+         .setPosition(1070, 15)
+         .setSize(150, 200)
          ;
 
   authorFontList.captionLabel().toUpperCase(true);
@@ -159,6 +167,15 @@ void draw() {
   fill(50);
   rect(0, 0, SCREENWIDTH, 50);
   if (baseFolder!="") {
+    int tempID = int(cp5.get(Textfield.class,"inputID").getText());
+    if (tempID!=0 && tempID!=startID) {
+      startID = tempID;
+      int index = getIndexForBookId(startID);
+      println("tempID:" + tempID + " index:" + index);
+      if (index!=-1) {
+        currentBook = index;
+      }
+    }
     if (refresh) {
       refresh = false;
       parseBook();
@@ -257,8 +274,8 @@ void getBookImages(JSONArray json_images) {
   for (i=0;i<l;i++) {
     String path = json_images.getString(i);
 
-    if (path.indexOf("cover") != -1
-      || path.indexOf("title") != -1
+    if (path.toLowerCase().indexOf("cover") != -1
+      || path.toLowerCase().indexOf("title") != -1
       || (!path.endsWith(".jpg") && !path.endsWith(".png"))) {
       // skip generic covers (usually named "cover.jpg" or "title.jpg")
       continue;
@@ -267,7 +284,7 @@ void getBookImages(JSONArray json_images) {
     path = baseFolder + path.replace("./","");
     // println("loading:" + path);
     temp = loadImage(path);
-    if (temp == null) {
+    if (temp == null || temp.width <= 0 || temp.height <= 0) {
       continue;
     }
     // check for faces (not faeces)
@@ -329,8 +346,27 @@ JSONObject getBook(int index) {
   return book;
 }
 
+int getIndexForBookId(int id) {
+  int l = bookList.length;
+  int i;
+  JSONObject book = new JSONObject();
+  for (i=0;i<l;i++) {
+    book = JSONObject.parse(bookList[i]);
+    int bid = book.getInt("identifier");
+    if (id == bid) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 void parseBook() {
   JSONObject book = getBook(currentBook);
+
+  currentId = book.getInt("identifier");
+
+  println("book id:" + currentId);
+
   title = book.getString("title");
   String subtitle = "";
   String json_author = "";
@@ -344,7 +380,6 @@ void parseBook() {
   if (!subtitle.equals("")) {
     title += ": " + subtitle;
   }
-  currentId = book.getInt("identifier");
   title = title.toUpperCase();
 
   try {
@@ -366,7 +401,7 @@ void parseBook() {
     json_author = book.getString("authors_short");
   }
   catch (Exception e) {
-    println("book has no authors");
+    println("book has no short authors");
   }
   if (!json_author.equals("") && author.length() > MAXAUTHORCHAR) {
     author = json_author;
@@ -475,11 +510,19 @@ void controlEvent(ControlEvent theEvent) {
       startTime = millis();
     }
   }
+
   if (theEvent.isGroup()) {
     // an event from a group e.g. scrollList
     println(theEvent.group().value()+" from "+theEvent.group());
   } else {
     refresh = true;
+  }
+
+  if(theEvent.isAssignableFrom(Textfield.class)) {
+    println("controlEvent: accessing a string from controller '"
+            +theEvent.getName()+"': "
+            +theEvent.getStringValue()
+            );
   }
 
   if(theEvent.isGroup() && theEvent.name().equals("titleList")){
