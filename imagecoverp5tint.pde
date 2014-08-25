@@ -115,14 +115,17 @@ void controlP5Setup() {
   cp5.addToggle("faceDetect")
      .setPosition(610,5)
      .setSize(50,20)
+     .setMode(ControlP5.SWITCH)
      ;
   cp5.addToggle("invert")
      .setPosition(670,5)
      .setSize(50,20)
+     .setMode(ControlP5.SWITCH)
      ;
   cp5.addToggle("batch")
      .setPosition(730,5)
      .setSize(50,20)
+     .setMode(ControlP5.SWITCH)
      ;
 
   cp5.addTextfield("inputID")
@@ -488,6 +491,7 @@ void keyPressed() {
   } else if (key == 's') {
     saveCurrent();
   }
+
   if (key == CODED) {
     refresh = true;
     if (keyCode == LEFT) {
