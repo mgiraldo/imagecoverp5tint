@@ -376,6 +376,7 @@ void parseBook() {
 
   title = book.getString("title");
   String subtitle = "";
+  String shorttitle = "";
   String json_author = "";
 
   try {
@@ -384,20 +385,20 @@ void parseBook() {
   catch (Exception e) {
     println("book has no subtitle");
   }
-  if (!subtitle.equals("")) {
-    title += ": " + subtitle;
+  if (!subtitle.equals("") && title.length() + subtitle.length() + 2 <= MAXTITLECHAR) {
+    title = title + ": " + subtitle;
   }
 
   title = title.toUpperCase();
 
   try {
-    subtitle = book.getString("title_short");
+    shorttitle = book.getString("title_short");
   }
   catch (Exception e) {
     // println("book has no short authors");
   }
-  if (!subtitle.equals("") && title.length() > MAXTITLECHAR) {
-    title = subtitle;
+  if (!shorttitle.equals("") && title.length() > MAXTITLECHAR) {
+    title = shorttitle;
   }
 
   try {
