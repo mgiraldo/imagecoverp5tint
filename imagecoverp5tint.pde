@@ -389,8 +389,6 @@ void parseBook() {
     title = title + ": " + subtitle;
   }
 
-  title = title.toUpperCase();
-
   try {
     shorttitle = book.getString("title_short");
   }
@@ -400,6 +398,8 @@ void parseBook() {
   if (!shorttitle.equals("") && title.length() > MAXTITLECHAR) {
     title = shorttitle;
   }
+
+  title = title.toUpperCase();
 
   try {
     json_author = book.getString("authors_long");
