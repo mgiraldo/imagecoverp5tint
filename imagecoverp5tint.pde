@@ -187,6 +187,7 @@ void draw() {
       if (images.size() == 0) {
         println("BOOK HAS NO USEFUL IMAGES");
       }
+      cp5.get(Textfield.class,"inputID").setText(""+currentId);
     }
     if (images.size() > 0) {
       drawCovers();
