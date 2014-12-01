@@ -19,6 +19,11 @@ int BACKGROUNDCOLOR = 128;
 int MAXAUTHORCHAR = 24;
 int MAXTITLECHAR = 80;
 
+// mode (if command line or gui)
+// command line args:
+// images_folder book_json title_font author_font
+boolean is_command_line = false;
+
 PGraphics pg;
 
 OpenCV opencv;
@@ -58,22 +63,50 @@ String title = "";
 String author = "";
 String filename = "";
 String baseFolder = "";
+String[] bookJsonFile;
 
 int startTime = 0;
 int imageCounter = 0;
 int startID = 0;
 
 void setup() {
-  selectFolder("Select a folder to process:", "folderSelected");
+  println("args:" + args.length);
+  if (args.length == 4) {
+    println("command line:" + args[0] + ":" + args[1] + ":" + args[2] + ":" + args[3]);
+    is_command_line = true;
+  }
+
   size(SCREENWIDTH, SCREENHEIGHT);
   background(255);
   noStroke();
   images = new ArrayList<PImage>();
   covers = new ArrayList<PImage>();
-  cp5 = new ControlP5(this);
+
   pg = createGraphics(COVERWIDTH, COVERHEIGHT);
-  controlP5Setup();
-  loadData();
+
+  if (!is_command_line) {
+    selectFolder("Select a folder to process:", "folderSelected");
+    cp5 = new ControlP5(this);
+    controlP5Setup();
+    loadData();
+  } else {
+    baseFolder = args[0];
+    bookJsonFile = loadStrings(args[1]);
+    String title_font = args[2];
+    String title_suffix = title_font.substring(title_font.lastIndexOf("-")+1,title_font.lastIndexOf("."));
+    int fontSize = int(title_suffix);
+    titleFont = loadFont(title_font);
+    titleSize = fontSize;
+    String author_font = args[3];
+    String author_suffix = author_font.substring(author_font.lastIndexOf("-")+1,author_font.lastIndexOf("."));
+    fontSize = int(author_suffix);
+    authorFont = loadFont(author_font);
+    authorSize = fontSize;
+    batch = true;
+    executeDraw();
+    // kill this before it shows a window
+    exit();
+  }
 }
 
 void controlP5Setup() {
@@ -167,11 +200,16 @@ void controlP5Setup() {
 }
 
 void draw() {
+  executeDraw();
+}
+
+void executeDraw() {
   background(255);
   fill(50);
   rect(0, 0, SCREENWIDTH, 50);
   if (baseFolder!="") {
-    int tempID = int(cp5.get(Textfield.class,"inputID").getText());
+    int tempID = 0;
+    if (!is_command_line) tempID = int(cp5.get(Textfield.class,"inputID").getText());
     if (tempID!=0 && tempID!=startID) {
       startID = tempID;
       int index = getIndexForBookId(startID);
@@ -187,7 +225,7 @@ void draw() {
       if (images.size() == 0) {
         println("BOOK HAS NO USEFUL IMAGES");
       }
-      cp5.get(Textfield.class,"inputID").setText(""+currentId);
+      if (!is_command_line) cp5.get(Textfield.class,"inputID").setText(""+currentId);
     }
     if (images.size() > 0) {
       drawCovers();
@@ -197,7 +235,7 @@ void draw() {
     saveCurrent();
     refresh = true;
     currentBook++;
-    if (currentBook >= bookList.length) {
+    if (!is_command_line && currentBook >= bookList.length) {
       currentBook = 0;
       batch = false;
       refresh = false;
@@ -346,11 +384,11 @@ void getBookImages(JSONArray json_images) {
   }
 }
 
-JSONObject getBook(int index) {
-  int l = bookList.length;
+JSONObject getBook(String[] list, int index) {
+  int l = list.length;
   int i;
   JSONObject book = new JSONObject();
-  book = JSONObject.parse(bookList[index]);
+  book = JSONObject.parse(list[index]);
   return book;
 }
 
@@ -369,7 +407,12 @@ int getIndexForBookId(int id) {
 }
 
 void parseBook() {
-  JSONObject book = getBook(currentBook);
+  JSONObject book;
+  if (!is_command_line) {
+    book = getBook(bookList, currentBook);
+  } else {
+    book = getBook(bookJsonFile, 0);
+  }
 
   currentId = book.getInt("identifier");
 
@@ -579,5 +622,4 @@ void folderSelected(File selection) {
     println("User selected " + baseFolder);
   }
 }
-
 
