@@ -21,7 +21,7 @@ int MAXTITLECHAR = 80;
 
 // mode (if command line or gui)
 // command line args:
-// images_folder book_json title_font author_font
+// images_folder book_json output_folder title_font author_font
 boolean is_command_line = false;
 
 PGraphics pg;
@@ -64,6 +64,7 @@ String author = "";
 String filename = "";
 String baseFolder = "";
 String[] bookJsonFile;
+String outputFolder = "";
 
 int startTime = 0;
 int imageCounter = 0;
@@ -71,8 +72,8 @@ int startID = 0;
 
 void setup() {
   println("args:" + args.length);
-  if (args.length == 4) {
-    println("command line:" + args[0] + ":" + args[1] + ":" + args[2] + ":" + args[3]);
+  if (args.length == 5) {
+    println("command line:" + args[0] + ":" + args[1] + ":" + args[2] + ":" + args[3] + ":" + args[4]);
     is_command_line = true;
   }
 
@@ -91,13 +92,14 @@ void setup() {
     loadData();
   } else {
     baseFolder = args[0];
-    bookJsonFile = loadStrings(args[1]);
-    String title_font = args[2];
+    outputFolder = args[1];
+    bookJsonFile = loadStrings(args[2]);
+    String title_font = args[3];
     String title_suffix = title_font.substring(title_font.lastIndexOf("-")+1,title_font.lastIndexOf("."));
     int fontSize = int(title_suffix);
     titleFont = loadFont(title_font);
     titleSize = fontSize;
-    String author_font = args[3];
+    String author_font = args[4];
     String author_suffix = author_font.substring(author_font.lastIndexOf("-")+1,author_font.lastIndexOf("."));
     fontSize = int(author_suffix);
     authorFont = loadFont(author_font);
@@ -538,7 +540,9 @@ void saveCurrent() {
   for (i=0;i<l;i++) {
     // save here
     PImage temp = covers.get(i); // get(x, y, COVERWIDTH, COVERHEIGHT);
-    temp.save("output/" + currentId + "/cover_" + currentId + "_" + i + ".png");
+    String out = "output/";
+    if (is_command_line) out = outputFolder;
+    temp.save(out + currentId + "/cover_" + currentId + "_" + i + ".png");
     // end save
   }
 

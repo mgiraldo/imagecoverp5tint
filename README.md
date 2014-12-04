@@ -12,11 +12,11 @@ You can run this program in an arbitrary book as long as you properly describe i
 
 Export the stand-alone **Linux** (32 or 64-bit) application from Processing via `File > Export Application` and run the resulting binary using:
 
-`./imagecoverp5tint /path/to/images/with/trailing/slash/ /path/to/book.json title_font_file-size.vlw author_font_file-size.vlw`
+`./imagecoverp5tint /path/to/images/with/trailing/slash/ /path/to/output/folder/with/trailing/slash/ /path/to/book.json title_font_file-size.vlw author_font_file-size.vlw`
 
 The VLW font files must conform to the specified `name-size.vlw` convention so that the application knows what size to apply when running. You create your own fonts via the `Tools > Create Font...` dialog.
 
-Generated covers are output to the `./output` folder from where it is run, creating a `./output/book-id` subfolder and putting the covers there in PNG format.
+Generated covers are output to the provided folder creating a `book-id/` subfolder and putting the covers there in PNG format.
 
 ## Example output
 
