@@ -46,6 +46,7 @@ boolean invert = true;
 boolean batch = false;
 
 ArrayList<PImage> images;
+ArrayList<String> image_names;
 ArrayList<PImage> covers;
 
 PFont titleFont;
@@ -82,6 +83,7 @@ void setup() {
   noStroke();
   images = new ArrayList<PImage>();
   covers = new ArrayList<PImage>();
+  image_names = new ArrayList<String>();
 
   pg = createGraphics(COVERWIDTH, COVERHEIGHT);
 
@@ -303,6 +305,7 @@ void loadData() {
 
 void getBookImages(JSONArray json_images) {
   images.clear();
+  image_names.clear();
 
   int minSize = 200;
 
@@ -383,6 +386,10 @@ void getBookImages(JSONArray json_images) {
     // end bicolor photo
     pg.endDraw();
     images.add(pg.get());
+    // get the file name
+    File f = new File(path);
+    String full_name = f.getName();
+    image_names.add(full_name.substring(0,full_name.lastIndexOf(".")));
   }
 }
 
@@ -542,7 +549,7 @@ void saveCurrent() {
     PImage temp = covers.get(i); // get(x, y, COVERWIDTH, COVERHEIGHT);
     String out = "output/";
     if (is_command_line) out = outputFolder;
-    temp.save(out + currentId + "/cover_" + currentId + "_" + i + ".png");
+    temp.save(out + currentId + "/cover_" + currentId + "_" + image_names.get(i) + ".png");
     // end save
   }
 
