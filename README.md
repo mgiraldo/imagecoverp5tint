@@ -3,10 +3,10 @@ Project Gutenberg eBook Cover Generator
 
 Built with [Processing](http://processing.org)
 
-## Reuirements
+## Requirements
 
 - **[OpenCV for Processing](https://github.com/atduskgreg/opencv-processing) for face recognition** for framing in a way inspired by the [work of Chris Marker and Jason Simon](http://www.lightindustry.org/simon_marker.jpg).
-- **[ControlP5](http://www.sojamo.de/libraries/controlP5/)**.
+- **[ControlP5](http://www.sojamo.de/libraries/controlP5/)** for parameter testing/control.
 
 ## Command-line use
 You can run this program in an arbitrary book as long as you properly describe it as shown in `test-book.json`. The JSON file must be only one line.
