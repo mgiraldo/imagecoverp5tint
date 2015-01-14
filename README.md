@@ -3,6 +3,8 @@ Project Gutenberg eBook Cover Generator
 
 Built with [Processing](http://processing.org)
 
+Read about this in more detail in [this blog post](http://www.nypl.org/blog/2014/09/03/generative-ebook-covers).
+
 ## Requirements
 
 You can add these libraries via the Processing package manager:
