@@ -5,6 +5,8 @@ Built with [Processing](http://processing.org)
 
 ## Requirements
 
+You can add these libraries via the Processing package manager: `Sketch ⟶ Import Library ⟶ Add Library…`
+
 - **[OpenCV for Processing](https://github.com/atduskgreg/opencv-processing) for face recognition** for framing in a way inspired by the [work of Chris Marker and Jason Simon](http://www.lightindustry.org/simon_marker.jpg).
 - **[ControlP5](http://www.sojamo.de/libraries/controlP5/)** for parameter testing/control.
 
