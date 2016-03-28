@@ -38,3 +38,9 @@ Generated covers are output to the provided folder creating a `book-id/` subfold
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example5.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example6.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example9.png)
+
+## License
+
+Adobe Caslon™ is copyright [Adobe Systems Incorporated](http://www.adobe.com/). Avenir® Next is copyright [Monotype GmbH](https://www.linotype.com/).
+
+Original code in this repository is released under [Creative Commons CC0 1.0 License](http://creativecommons.org/publicdomain/zero/1.0).
