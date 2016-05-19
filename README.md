@@ -29,18 +29,11 @@ Generated covers are output to the provided folder creating a `book-id/` subfold
 
 ## Example output
 
-![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/cover_jane_eyre.small.png)
-![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/cover_jungle_book.small.png)
-![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/cover_tale.small.png)
-
+![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example1.png)
+![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example7.png)
+![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example8.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example2.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example3.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example4.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example5.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example6.png)
-
-## License
-
-Adobe Caslon™ is copyright [Adobe Systems Incorporated](http://www.adobe.com/). Avenir® Next is copyright [Monotype GmbH](https://www.linotype.com/).
-
-Original code in this repository is released under [Creative Commons CC0 1.0 License](http://creativecommons.org/publicdomain/zero/1.0).
