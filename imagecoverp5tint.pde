@@ -4,20 +4,21 @@ import java.awt.Rectangle;
 import java.util.Arrays;
 
 // constants
-int SCREENWIDTH = 1280;
-int SCREENHEIGHT = 1000;
+int SCREENWIDTH = 2400;
+int SCREENHEIGHT = 1300;
 int ARTWORKSTARTX = 400;
 int ARTWORKSTARTY = 75;
-int COVERWIDTH = 200;
+int COVERWIDTH = 360;
 int COVERHEIGHT = 300;
 float COVERRATIO = float(COVERWIDTH) / float(COVERHEIGHT);
-int MARGIN = 5;
+int MARGIN = 10;
 int IMAGEMARGIN = 10;
-int TITLEHEIGHT = 50;
-int AUTHORHEIGHT = 25;
+int TITLEHEIGHT = 100;
+int AUTHORHEIGHT = 50;
 int BACKGROUNDCOLOR = 128;
 int MAXAUTHORCHAR = 24;
 int MAXTITLECHAR = 80;
+int BORDERTHICKNESS = 4; // percent
 
 // mode (if command line or gui)
 // command line args:
@@ -34,20 +35,24 @@ ControlP5 cp5;
 DropdownList titleFontList;
 DropdownList authorFontList;
 
-int baseSaturation = 60;//70;
-int baseBrightness = 80;//85;
+int borderThick = 5; // percent
+int baseSaturation = 50;//70;
+int baseBrightness = 100;//85;
 int imageBrightness = -200;
 int imageAlpha = 10;
 int topMargin = 220;
-int textBackgroundAlpha = 210;
+int textBackgroundAlpha = 200;
 int lineThickness = 0;
+int colorDistance = 270;
 boolean faceDetect = false;
-boolean invert = true;
+boolean invert = false;
 boolean batch = false;
 
 ArrayList<PImage> images;
 ArrayList<String> image_names;
 ArrayList<PImage> covers;
+
+JSONArray json_images;
 
 PFont titleFont;
 PFont authorFont;
@@ -55,7 +60,8 @@ int titleSize;
 int authorSize;
 
 color baseColor;
-color textColor;
+color otherColor;
+color textColor = color(0);
 boolean refresh = true;
 String[] bookList;
 int currentBook = 0;
@@ -70,6 +76,8 @@ String outputFolder = "";
 int startTime = 0;
 int imageCounter = 0;
 int startID = 0;
+
+int currentCover = 0;
 
 void setup() {
   println("args:" + args.length);
@@ -97,14 +105,12 @@ void setup() {
     outputFolder = args[1];
     bookJsonFile = loadStrings(args[2]);
     String title_font = args[3];
-    String title_suffix = title_font.substring(title_font.lastIndexOf("-")+1,title_font.lastIndexOf("."));
-    int fontSize = int(title_suffix);
-    titleFont = loadFont(title_font);
+    int fontSize = 14;
+    titleFont = createFont(title_font, fontSize);
     titleSize = fontSize;
     String author_font = args[4];
-    String author_suffix = author_font.substring(author_font.lastIndexOf("-")+1,author_font.lastIndexOf("."));
-    fontSize = int(author_suffix);
-    authorFont = loadFont(author_font);
+    fontSize = 14;
+    authorFont = createFont(author_font, fontSize);
     authorSize = fontSize;
     batch = true;
     executeDraw();
@@ -126,81 +132,79 @@ void controlP5Setup() {
     .setSize(200,10)
     .setId(3)
     ;
-  cp5.addSlider("imageAlpha")
+  cp5.addSlider("colorDistance")
     .setPosition(10,35)
-    .setRange(0,200)
+    .setRange(0,360)
     .setSize(200,10)
     .setId(3)
     ;
-  cp5.addSlider("topMargin")
+  cp5.addSlider("COVERWIDTH")
     .setPosition(300,5)
-    .setRange(MARGIN,COVERHEIGHT-MARGIN)
-    .setSize(200,10)
+    .setRange(200,3700)
+    .setSize(400,10)
     .setId(3)
     ;
   cp5.addSlider("textBackgroundAlpha")
     .setPosition(300,20)
     .setRange(0,255)
-    .setSize(200,10)
+    .setSize(400,10)
     .setId(3)
     ;
-  cp5.addSlider("lineThickness")
+  cp5.addSlider("BORDERTHICKNESS")
     .setPosition(300,35)
     .setRange(0,10)
-    .setSize(200,10)
+    .setSize(400,10)
     .setId(3)
     ;
   cp5.addToggle("faceDetect")
-     .setPosition(610,5)
+     .setPosition(810,5)
      .setSize(50,20)
      .setMode(ControlP5.SWITCH)
      ;
   cp5.addToggle("invert")
-     .setPosition(670,5)
+     .setPosition(870,5)
      .setSize(50,20)
      .setMode(ControlP5.SWITCH)
      ;
   cp5.addToggle("batch")
-     .setPosition(730,5)
+     .setPosition(930,5)
      .setSize(50,20)
      .setMode(ControlP5.SWITCH)
      ;
 
   cp5.addTextfield("inputID")
-     .setPosition(790,5)
+     .setPosition(990,5)
      .setSize(100,20)
      .setFocus(true)
      .setColor(color(255,0,0))
      ;
 
   titleFontList = cp5.addDropdownList("titleList")
-         .setPosition(900, 15)
+         .setPosition(1100, 15)
          .setSize(150, 200)
          ;
 
   titleFontList.captionLabel().toUpperCase(true);
   titleFontList.captionLabel().set("Font");
-  titleFontList.addItem("ACaslonPro-Regular-16.vlw", 0);
-  titleFontList.addItem("ACaslonPro-Italic-16.vlw", 1);
-  titleFontList.addItem("ACaslonPro-Semibold-18.vlw", 2);
-  titleFontList.addItem("AvenirNext-Bold-18.vlw", 3);
-  titleFontList.addItem("AvenirNext-Regular-18.vlw", 4);
-  titleFontList.addItem("AvenirNext-Bold-16.vlw", 5);
-  titleFontList.addItem("AvenirNext-Bold-14.vlw", 6);
-  titleFontList.setIndex(6);
+  titleFontList.addItem("ACaslonPro-Regular", 0);
+  titleFontList.addItem("ACaslonPro-Italic", 1);
+  titleFontList.addItem("ACaslonPro-Semibold", 2);
+  titleFontList.addItem("AvenirNext-Bold", 3);
+  titleFontList.addItem("AvenirNext-Regular", 4);
+  titleFontList.setIndex(3);
 
   authorFontList = cp5.addDropdownList("authorList")
-         .setPosition(1070, 15)
+         .setPosition(1270, 15)
          .setSize(150, 200)
          ;
 
   authorFontList.captionLabel().toUpperCase(true);
   authorFontList.captionLabel().set("Font");
-  authorFontList.addItem("ACaslonPro-Italic-14.vlw", 0);
-  authorFontList.addItem("ACaslonPro-Regular-16.vlw", 1);
-  authorFontList.addItem("AvenirNext-Bold-14.vlw", 2);
-  authorFontList.addItem("AvenirNext-Regular-14.vlw", 3);
-  authorFontList.setIndex(2);
+  authorFontList.addItem("ACaslonPro-Italic", 0);
+  authorFontList.addItem("ACaslonPro-Regular", 1);
+  authorFontList.addItem("AvenirNext-Bold", 2);
+  authorFontList.addItem("AvenirNext-Regular", 3);
+  authorFontList.setIndex(0);
 }
 
 void draw() {
@@ -224,16 +228,24 @@ void executeDraw() {
     }
     if (refresh) {
       refresh = false;
+      COVERHEIGHT = int(COVERWIDTH * 1.5);
+      COVERRATIO = float(COVERWIDTH) / float(COVERHEIGHT);
+      borderThick = int(COVERWIDTH*BORDERTHICKNESS / 100);
+      MARGIN = int(COVERHEIGHT * 0.05);
+      titleSize = int(COVERWIDTH * 0.08);
+      authorSize = int(COVERWIDTH * 0.08);
+      topMargin = int(COVERHEIGHT * 0.68);
+      pg = createGraphics(COVERWIDTH, COVERHEIGHT);
       parseBook();
       createCovers();
-      if (images.size() == 0) {
-        println("BOOK HAS NO USEFUL IMAGES");
-      }
+      // if (images.size() == 0) {
+      //   println("BOOK HAS NO USEFUL IMAGES");
+      // }
       if (!is_command_line) cp5.get(Textfield.class,"inputID").setText(""+currentId);
     }
-    if (images.size() > 0) {
+    // if (images.size() > 0) {
       drawCovers();
-    }
+    // }
   }
   if (batch) {
     saveCurrent();
@@ -264,28 +276,27 @@ void drawCovers() {
   int x = 0;
   int y = 0;
   // println(images);
-  for (i=0;i<l;i++) {
+  // for (i=0;i<l;i++) {
     x = xini + (col * (colWidth));
     y = yini + (row * rowHeight);
-    image(covers.get(i), x, y);
+    image(covers.get(0), x, y);
     col++;
     if (col >= cols) {
       col = 0;
       row++;
     }
-  }
+  // }
 }
 
 void createCovers() {
   covers.clear();
-  int i, l = images.size();;
+  int i, l = json_images.size();
 
   if (l==0) return;
 
-  for (i=0;i<l;i++) {
-    imageCounter++;
-    covers.add(createCover(i));
-  }
+  // for (i=0;i<l;i++) {
+    covers.add(createCover(currentCover));
+  // }
 }
 
 PImage createCover(int index) {
@@ -299,44 +310,56 @@ PImage createCover(int index) {
 }
 
 void loadData() {
-  bookList = loadStrings("illustration_list.json");
+  bookList = loadStrings("test-book.json");
   // config = loadStrings("ids.txt");
 }
 
-void getBookImages(JSONArray json_images) {
+void getBookImages() {
+  imageCounter = 0;
   images.clear();
   image_names.clear();
-
-  int minSize = 200;
 
   PImage temp, img, imgBW;
   int i;
   float w, h;
-  int maxHeight = 140;
-
-  IntList indexes = new IntList();
 
   int l = json_images.size();
 
   // println("ratio:" + COVERRATIO);
   for (i=0;i<l;i++) {
-    String path = json_images.getString(i);
+    getBookImage(i);
+    imageCounter++;
+  }
+}
+
+PImage getBookImage(int index) {
+  PImage temp, img, imgBW;
+  float w, h;
+
+  // int l = json_images.size();
+
+  // println("ratio:" + COVERRATIO);
+  // for (i=0;i<l;i++) {
+    String path = json_images.getString(index);
 
     if (path.toLowerCase().indexOf("cover") != -1
       || path.toLowerCase().indexOf("title") != -1
       || path.toLowerCase().indexOf("page-images") != -1
       || path.toLowerCase().indexOf("thumb") != -1
       || path.endsWith("-t.jpg")
+      || path.endsWith("t.jpg")
+      || path.endsWith("s.jpg")
+      || path.endsWith("m.jpg")
       || (!path.endsWith(".jpg") && !path.endsWith(".png"))) {
       // skip generic covers (usually named "cover.jpg" or "title.jpg")
-      continue;
+      // return new PImage();
     }
 
     path = baseFolder + path.replace("./","");
-    // println("loading:" + path);
+    println("loading:" + path);
     temp = loadImage(path);
     if (temp == null || temp.width <= 0 || temp.height <= 0) {
-      continue;
+      // return new PImage();
     }
     // check for faces (not faeces)
     if (faceDetect) {
@@ -354,43 +377,40 @@ void getBookImages(JSONArray json_images) {
     w = temp.width;
     h = temp.height;
     float ratio = w/h;
-    // println("i1:" + i + " w:" + temp.width + " h:" + temp.height + " r:" + ratio);
+    int padding = borderThick*2;
+    println("cratio:" + COVERRATIO + " w:" + temp.width + " h:" + temp.height + " r:" + ratio + " padd:" + padding);
     if (ratio >= COVERRATIO) {
       // temp.resize(COVERWIDTH-IMAGEMARGIN*2, 0);
-      temp.resize(0, COVERHEIGHT + MARGIN*3);
-      imgBW = temp.get(int((temp.width-COVERWIDTH)*.5)+MARGIN, MARGIN, COVERWIDTH, COVERHEIGHT);
+      temp.resize(0, COVERHEIGHT);
+      imgBW = temp.get(int((temp.width-COVERWIDTH)*.5)+borderThick, borderThick, COVERWIDTH - padding, COVERHEIGHT - padding);
       // println("wider");
     } else {
       // temp.resize(0, maxHeight);
-      temp.resize(COVERWIDTH + MARGIN*3, 0);
-      imgBW = temp.get(MARGIN, int((temp.height-COVERHEIGHT)*.5)+MARGIN, COVERWIDTH, COVERHEIGHT);
+      temp.resize(COVERWIDTH, 0);
+      imgBW = temp.get(borderThick, int((temp.height-COVERHEIGHT)*.5)+borderThick, COVERWIDTH - padding, COVERHEIGHT - padding);
       // println("taller");
     }
-    // println("i2:" + i + " w:" + temp.width + " h:" + temp.height);
-    // println("i3:" + i + " w:" + int((temp.width-COVERWIDTH)*.5) + " h:" + int((temp.height-COVERHEIGHT)*.5));
+    println(" w:" + temp.width + " h:" + temp.height + " bw:" + imgBW.width + " bh:" + imgBW.height);
+    println(" cw:" + COVERWIDTH + " ch:" + COVERHEIGHT);
     imgBW.filter(GRAY);
     // if (invert) {
     //   imgBW.filter(INVERT);
     // }
-    img = imgBW.get(0, 0, COVERWIDTH, COVERHEIGHT);
-    imgBW = imgBW.get(0, topMargin-MARGIN, COVERWIDTH, COVERHEIGHT-topMargin+MARGIN);
+    img = imgBW.get();//0, 0, COVERWIDTH - MARGIN - padding, COVERHEIGHT - MARGIN - padding);
+    // imgBW = imgBW.get(0, topMargin-MARGIN, COVERWIDTH - padding, COVERHEIGHT-topMargin+MARGIN - padding);
 
     pg.clear();
     pg.beginDraw();
     pg.background(baseColor);
     pg.tint(baseColor);
-    pg.image(img, 0, 0);
+    pg.image(img, borderThick, borderThick);
     // for bicolor photo
     pg.noTint();
     // pg.image(imgBW, 0, topMargin-MARGIN);
     // end bicolor photo
     pg.endDraw();
-    images.add(pg.get());
-    // get the file name
-    File f = new File(path);
-    String full_name = f.getName();
-    image_names.add(full_name.substring(0,full_name.lastIndexOf(".")));
-  }
+    return pg.get();
+  // }
 }
 
 JSONObject getBook(String[] list, int index) {
@@ -483,30 +503,29 @@ void parseBook() {
 
   processColors();
 
-  JSONArray json_images = book.getJSONArray("illustrations");
-  if (json_images.size() > 0) {
-    getBookImages(json_images);
-  }
+  json_images = book.getJSONArray("illustrations");
+
+  imageCounter = json_images.size();
 }
 
 void processColors() {
   int counts = title.length() + author.length();
-  int colorSeed = int(map(counts, 6, MAXTITLECHAR+MAXAUTHORCHAR, 30, 260));
+  int colorSeed = int(map(counts, 6, MAXTITLECHAR+MAXAUTHORCHAR, 30, 300));
   colorMode(HSB, 360, 100, 100);
-  color lightColor = color((colorSeed+180)%360, baseSaturation-20, baseBrightness+40);
-  color darkColor = color(colorSeed, baseSaturation, baseBrightness-20);
-  textColor = lightColor;
+  color lightColor = color((colorSeed+colorDistance)%360, baseSaturation+20, baseBrightness);
+  color darkColor = color(colorSeed, baseSaturation-20, baseBrightness-20);
+  otherColor = lightColor;
   baseColor = darkColor;
   if (invert) {
     baseColor = lightColor;
-    textColor = darkColor;
+    otherColor = darkColor;
   }
   // println("baseColor:"+baseColor);
   colorMode(RGB, 255);
 }
 
 void drawArtwork(PGraphics g, int index, int _x, int _y) {
-  PImage img = images.get(index);
+  PImage img = getBookImage(index);
   int x = _x; //+int((COVERWIDTH - img.width) * .5);
   int y = _y; //+int((COVERHEIGHT - img.height) * .5);
   g.image(img, x, y);
@@ -519,37 +538,46 @@ void drawBackground(PGraphics g, int x, int y) {
 
 void drawText(PGraphics g, int x, int y) {
   //…
+  MARGIN = int(COVERWIDTH * 0.01);
+  int boxStart = y+topMargin-MARGIN;
+  int boxHeight = (COVERHEIGHT - topMargin);
+  TITLEHEIGHT = int((boxHeight - MARGIN - MARGIN) * 0.5);
+  AUTHORHEIGHT = int((boxHeight - MARGIN - MARGIN) * 0.5);
   g.noStroke();
   // for text box
-  g.fill(textColor);
-  g.rect(x, y+topMargin-lineThickness-MARGIN, COVERWIDTH, lineThickness);
-  if (invert) {
-    g.fill(255, textBackgroundAlpha);
-  } else {
-    g.fill(0, textBackgroundAlpha);
-  }
-  g.rect(x, y+topMargin-MARGIN, COVERWIDTH, COVERHEIGHT-topMargin+MARGIN);
+  // g.rect(x, boxStart-lineThickness, COVERWIDTH, borderThick);
+  g.fill(255, textBackgroundAlpha);
+  g.rect(x, boxStart, COVERWIDTH, COVERHEIGHT-topMargin+MARGIN);
   // end text box
-  g.fill(textColor);
+  g.fill(0);
   g.textFont(titleFont, titleSize);
   g.textLeading(titleSize);
-  g.textAlign(LEFT);
-  g.text(title, x+MARGIN, y+topMargin, COVERWIDTH - (2 * MARGIN), TITLEHEIGHT);
+  g.textAlign(CENTER);
+  // g.fill(otherColor);
+  g.text(title, x+MARGIN+borderThick, boxStart+(MARGIN*5), COVERWIDTH - (2 * MARGIN) - (2 * borderThick), TITLEHEIGHT);
   g.textLeading(authorSize);
   g.textFont(authorFont, authorSize);
-  g.text(author, x+MARGIN, y+topMargin+TITLEHEIGHT+MARGIN, COVERWIDTH - (2 * MARGIN), AUTHORHEIGHT);
+  g.text(author, x+MARGIN+borderThick, boxStart+TITLEHEIGHT+MARGIN, COVERWIDTH - (2 * MARGIN) - (2 * borderThick), AUTHORHEIGHT);
+  // borders
+  g.fill(0);
+  g.rect((COVERWIDTH-borderThick*2)*.5,boxStart+TITLEHEIGHT+MARGIN-borderThick*.5,borderThick*2,int(COVERWIDTH*0.005));
+  g.fill(otherColor);
+  g.rect(0,0,borderThick,COVERHEIGHT);
+  g.rect(COVERWIDTH-borderThick,0,borderThick,COVERHEIGHT);
+  g.rect(0,0,COVERWIDTH,borderThick);
+  g.rect(0,COVERHEIGHT-borderThick,COVERWIDTH,borderThick);
 }
 
 void saveCurrent() {
   int i, l;
-  l = images.size();
+  l = covers.size();
   // println(images);
   for (i=0;i<l;i++) {
     // save here
     PImage temp = covers.get(i); // get(x, y, COVERWIDTH, COVERHEIGHT);
     String out = "output/";
     if (is_command_line) out = outputFolder;
-    temp.save(out + currentId + "/cover_" + currentId + "_" + image_names.get(i) + ".png");
+    temp.save(out + currentId + "/cover_" + currentId + "_" + i + ".png");
     // end save
   }
 
@@ -567,9 +595,21 @@ void keyPressed() {
     refresh = true;
     if (keyCode == LEFT) {
       currentBook--;
+      currentCover = 0;
     } else if (keyCode == RIGHT) {
       currentBook++;
+      currentCover = 0;
+    } else if (keyCode == UP) {
+      currentCover++;
+    } else if (keyCode == DOWN) {
+      currentCover--;
     }
+  }
+  if (currentCover >= imageCounter) {
+    currentCover = 0;
+  }
+  if (currentCover < 0) {
+    currentCover = imageCounter-1;
   }
   if (currentBook >= bookList.length) {
     currentBook = 0;
@@ -604,10 +644,8 @@ void controlEvent(ControlEvent theEvent) {
     int index = (int)theEvent.group().value();
     String font = titleFontList.getItem(index).getName();
     println("index:"+index + " font:" + font);
-    String suffix = font.substring(font.lastIndexOf("-")+1,font.lastIndexOf("."));
-    int fontSize = int(suffix);
-    println("size:" + suffix);
-    titleFont = loadFont(font);
+    int fontSize = 14;
+    titleFont = createFont(font, fontSize);
     titleSize = fontSize;
     refresh = true;
   }
@@ -616,10 +654,8 @@ void controlEvent(ControlEvent theEvent) {
     int index = (int)theEvent.group().value();
     String font = authorFontList.getItem(index).getName();
     println("index:"+index + " font:" + font);
-    String suffix = font.substring(font.lastIndexOf("-")+1,font.lastIndexOf("."));
-    int fontSize = int(suffix);
-    println("size:" + suffix);
-    authorFont = loadFont(font);
+    int fontSize = 14;
+    authorFont = createFont(font, fontSize);
     authorSize = fontSize;
     refresh = true;
   }
