@@ -32,6 +32,7 @@ Generated covers are output to the provided folder creating a `book-id/` subfold
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/cover_jane_eyre.small.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/cover_jungle_book.small.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/cover_tale.small.png)
+
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example2.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example3.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example4.png)
