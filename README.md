@@ -37,3 +37,9 @@ Generated covers are output to the provided folder creating a `book-id/` subfold
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example4.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example5.png)
 ![Example](https://github.com/mgiraldo/imagecoverp5tint/blob/master/output/example6.png)
+
+## License
+
+See [LICENSE](LICENSE)
+
+
